@@ -33,7 +33,7 @@ namespace Discharger {
 
     uint16_t getValue();
     void setValue(uint16_t current, uint16_t voltage);
-    void setRealValue(uint16_t I);
+    void setRealValue(uint16_t I, uint16_t V);
 
     void powerOn();
     void powerOff(STATE reason = DISCHARGING_COMPLETE);

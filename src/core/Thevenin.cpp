@@ -36,7 +36,8 @@ AnalogInputs::ValueType Resistance::getReadableRth()
 AnalogInputs::ValueType Resistance::getReadableRth_calibrateI(AnalogInputs::Name name)
 {
     Resistance R;
-    R.uI_ = AnalogInputs::calibrateValue(name, uI_);
+    //R.uI_ = AnalogInputs::calibrateValue(name, uI_);
+    R.uI_ = uI_;
     R.iV_ = iV_;
     return R.getReadableRth();
 }

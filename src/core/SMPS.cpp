@@ -28,7 +28,7 @@
 
 namespace SMPS {
     STATE state_;
-    uint16_t current_, voltage_;		//ign	
+    uint16_t current_;		//ign	
 
 
     STATE getState()    { return state_; }
@@ -56,16 +56,18 @@ void SMPS::setValue(uint16_t current, uint16_t voltage)
       if(current > settings.SMPS_Upperbound_Value_) current = settings.SMPS_Upperbound_Value_;
     }
 
-    current_ = current;
-	hardware::setChargerValue(AnalogInputs::reverseCalibrateValue(AnalogInputs::IsmpsValue, current_), AnalogInputs::reverseCalibrateValue(AnalogInputs::Vout_plus_pin, voltage));
+ //   current_ = current;
+//	hardware::setChargerValue(AnalogInputs::reverseCalibrateValue(AnalogInputs::IsmpsValue, current_), AnalogInputs::reverseCalibrateValue(AnalogInputs::Vout_plus_pin, voltage));
+	hardware::setChargerValue(current, voltage);
     AnalogInputs::resetMeasurement();
 }
 
-void SMPS::setRealValue(uint16_t I)
+void SMPS::setRealValue(uint16_t I, uint16_t V)
 {
-	voltage_ = AnalogInputs::reverseCalibrateValue(AnalogInputs::Vout_plus_pin, TheveninMethod::Vend_);		//ign
+current_ = I;
+	uint16_t voltage = AnalogInputs::reverseCalibrateValue(AnalogInputs::Vout_plus_pin, V);		//ign
     uint16_t current = AnalogInputs::reverseCalibrateValue(AnalogInputs::IsmpsValue, I);
-    setValue(current, voltage_);
+    setValue(current, voltage);
 }
 
 void SMPS::powerOn()

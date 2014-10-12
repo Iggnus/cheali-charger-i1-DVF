@@ -215,7 +215,7 @@ void sendEnd()
 
 void sendChannel1()
 {
-//return; //ign
+//return;		//ign
     sendHeader(1);
     //analog inputs
     for(int8_t i=0;i < sizeOfArray(channel1);i++) {
@@ -329,7 +329,7 @@ void dumpCalibration()
 }
 void sendCalibration()
 {
-//return; //ign
+//return;		//ign
     serialBegin();
     dumpCalibration();
     printNL();

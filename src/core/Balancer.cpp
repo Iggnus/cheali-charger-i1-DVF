@@ -23,8 +23,6 @@
 #include "Hardware.h"
 #include "memory.h"
 
-//#include "SerialLog.h"  //ign
-
 
 namespace Balancer {
     uint8_t cells_;
@@ -135,13 +133,10 @@ void Balancer::setBalance(uint8_t v)
 
 void Balancer::startBalacing()
 {
- //SerialLog::printString("B::start?"); //SerialLog::printUInt(c); SerialLog::printD(); SerialLog::printUInt(value); SerialLog::printD(); SerialLog::printUInt(getMinValueB());   //ign
- //SerialLog::printNL();  //ign
     //test if battery has recovered after last balancing
     if(!isStable(balancerStartStableCount))
         return;
- //SerialLog::printString("B::startBalancing"); //SerialLog::printUInt(c); SerialLog::printD(); SerialLog::printUInt(value); SerialLog::printD(); SerialLog::printUInt(getMinValueB());   //ign
- //SerialLog::printNL();  //ign
+
     minCell_ = getCellMinV();
     AnalogInputs::ValueType vmin = getV(minCell_);
 
@@ -159,13 +154,9 @@ void Balancer::startBalacing()
     savedVon_ = false;
     startBalanceTime_ = Timer::getMiliseconds();
     if(off) {
- //SerialLog::printString("B::endBalancing"); //SerialLog::printUInt(c); SerialLog::printD(); SerialLog::printUInt(value); SerialLog::printD(); SerialLog::printUInt(getMinValueB());   //ign
- //SerialLog::printNL();  //ign
         endBalancing();
     } else {
- //SerialLog::printString("B::setBalance"); //SerialLog::printUInt(c); SerialLog::printD(); SerialLog::printUInt(value); SerialLog::printD(); SerialLog::printUInt(getMinValueB());   //ign
- //SerialLog::printNL();  //ign
-		done_ = false;
+		done_ = false;		//ign
         setBalance(calculateBalance());
     }
 }
@@ -194,13 +185,8 @@ bool Balancer::isStable(const uint16_t stableCount)
 {
     for(uint8_t c = 0; c < cells_; c++) {
         if(AnalogInputs::getStableCount(AnalogInputs::Name(AnalogInputs::Vb1+c)) < stableCount)
-{ //SerialLog::printString("B::isS false "); SerialLog::printUInt(c); SerialLog::printD(); SerialLog::printUInt(AnalogInputs::getStableCount(AnalogInputs::Name(AnalogInputs::Vb1+c))); //SerialLog::printD(); SerialLog::printUInt(getMinValueB());   //ign
-  //SerialLog::printNL();  //ign
-			return false;
-}	//ign
+            return false;
     }
- //SerialLog::printString("B::isS true"); //SerialLog::printUInt(isEndVout); SerialLog::printD(); SerialLog::printUInt(value); SerialLog::printD(); SerialLog::printUInt(getMinValueB());   //ign
- //SerialLog::printNL();  //ign
     return true;
 }
 
@@ -222,8 +208,6 @@ uint16_t Balancer::getBalanceTime()
 
 Strategy::statusType Balancer::doStrategy()
 {
- //SerialLog::printString("B::doStrategy"); //SerialLog::printUInt(c); SerialLog::printD(); SerialLog::printUInt(value); SerialLog::printD(); SerialLog::printUInt(getMinValueB());   //ign
- //SerialLog::printNL();  //ign
     if(isStable()) {
         if(balance_ == 0) {
             startBalacing();

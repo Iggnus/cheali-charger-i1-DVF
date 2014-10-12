@@ -22,10 +22,10 @@ namespace {
 #define A 4
 //long error;
 uint16_t cnt = 0;			//ign
-uint16_t Vcell_err;		//ign
-uint16_t Vcell_err_OFF;		//ign
-uint16_t softstart;		//ign
-uint8_t balance_;		//ign
+int16_t softstart;				//ign
+uint16_t Vcell_err = 0;		//ign
+uint16_t Vcell_err_OFF = 0;		//ign
+uint8_t balance_ = 0;		//ign
 
 AnalogInputs::ValueType Vend_per_cell;		//ign
 AnalogInputs::ValueType Vcell_;		//ign
@@ -55,8 +55,6 @@ void SMPS_PID::update()
         return;
     }
 
-
-
 long error;
 
 #ifndef FAST_FEEDBACK  
@@ -66,8 +64,8 @@ if(cnt > 349) {
 cnt = 0;
 Vcell_ = 0;
 
-if (Balancer::balance_ > balance_) {balance_ = Balancer::balance_; Vcell_err_OFF = Vcell_err; softstart = 10; }
-if (Balancer::balance_ < balance_) {balance_ = Balancer::balance_; Vcell_err = Vcell_err_OFF; softstart = i_PID_setpoint / 32; }
+if (Balancer::balance_ > balance_) {balance_ = Balancer::balance_; Vcell_err_OFF = Vcell_err; softstart = 1;}
+if (Balancer::balance_ < balance_) {balance_ = Balancer::balance_; Vcell_err = Vcell_err_OFF; softstart = i_PID_setpoint / 16;}
 
 // SerialLog::printString("SMPS_PID::update "); //SerialLog::printUInt(); SerialLog::printD(); SerialLog::printUInt();		//ign
 
@@ -137,8 +135,12 @@ if(error > PV) PV = error;
 
     error = i_PID_setpoint;
     error -= PV;
-
-    if(error > softstart) error = softstart;
+	
+    if(error > softstart) error = softstart;	//ign	SOFT START
+/*     if(balance_) {
+		if(error > 1) error = 1;
+	}
+	else if(error > softstart) error = softstart; */
 	
 	if(i_PID_enable) {
 		i_PID_MV += error*A;
@@ -147,7 +149,7 @@ if(error > PV) PV = error;
 		SMPS_PID::setPID_MV(i_PID_MV>>PID_MV_PRECISION);
 	}
 	else if(!IO::digitalRead(DISCHARGE_DISABLE_PIN)) {
-		i_PID_MV += error/3;
+		i_PID_MV += error/8;
 		if(i_PID_MV < 0) i_PID_MV = 0;
 		if(i_PID_MV > i_PID_setpoint) i_PID_MV = i_PID_setpoint;		//ign   hm...
 		hardware::setDischarge(i_PID_MV);
@@ -203,7 +205,7 @@ void hardware::setChargerValue(uint16_t curr, uint16_t volt)
 
 // SerialLog::printString("h::sCV "); SerialLog::printUInt(AnalogInputs::getADCValue(AnalogInputs::Vout_plus_pin)); SerialLog::printD(); SerialLog::printUInt(AnalogInputs::reverseCalibrateValue(AnalogInputs::Vout_plus_pin, TheveninMethod::Vend_));		//ign
 // SerialLog::printNL();	//ign
-	softstart = curr / 32;
+	softstart = curr / 16;
 	Vend_per_cell = Balancer::calculatePerCell(TheveninMethod::Vend_);
 	cells_ = AnalogInputs::getRealValue(AnalogInputs::VbalanceInfo);
 
@@ -221,6 +223,14 @@ void hardware::setChargerValue(uint16_t curr, uint16_t volt)
 		voltage = volt;		//ign
 	}
 }
+
+/* void hardware::setDischargerValue(uint16_t curr, uint16_t volt)
+{
+	setChargerValue(curr, volt);
+//	i_PID_setpoint = curr;
+//	voltage = volt;
+	//Timer1::setPWM(DISCHARGE_VALUE_PIN, curr);
+} */
 
 void hardware::setChargerOutput(bool enable)
 {
@@ -247,14 +257,6 @@ void hardware::setDischargerOutput(bool enable)
     if(enable) setChargerOutput(false);
     IO::digitalWrite(DISCHARGE_DISABLE_PIN, !enable);
 Vcell_err = 0;
-}
-
-void hardware::setDischargerValue(uint16_t curr, uint16_t volt)
-{
-	setChargerValue(curr, volt);
-//    i_PID_setpoint = curr;
-//	voltage = volt;
-	//Timer1::setPWM(DISCHARGE_VALUE_PIN, curr);
 }
 
 void hardware::setDischarge(uint16_t curr)

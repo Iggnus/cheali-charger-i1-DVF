@@ -23,8 +23,10 @@
 #include "Utils.h"
 #include "Settings.h"
 
-//#include "SerialLog.h"  //ign
 #include "IO.h"
+
+//#include "SerialLog.h"		//ign
+
 
 namespace TheveninMethod {
     uint16_t minValue_;
@@ -111,7 +113,6 @@ void TheveninMethod::setVIB(AnalogInputs::ValueType Vend, AnalogInputs::ValueTyp
     balance_ = balance;
     }                    //ign
     maxValue_ = i;
-//    minValue_ = i /settings.Lixx_Imin_;    //default=10
     minValue_ = i;
     minValue_ /= settings.Lixx_Imin_;    //default=10
         //low current
@@ -121,9 +122,6 @@ void TheveninMethod::setVIB(AnalogInputs::ValueType Vend, AnalogInputs::ValueTyp
 
 void TheveninMethod::initialize(AnalogInputs::Name iName)
 {
-//SerialLog::printString("TM::init "); //SerialLog::printUInt(Vend); SerialLog::printD(); SerialLog::printUInt(i);  //ign
-//SerialLog::printNL();  //ign
-
     bstatus_ = Strategy::COMPLETE;
     bool charge = (iName == AnalogInputs::IsmpsValue);
 
@@ -150,13 +148,14 @@ void TheveninMethod::initialize(AnalogInputs::Name iName)
 
 bool TheveninMethod::isComlete(bool isEndVout, AnalogInputs::ValueType value)
 {
-// SerialLog::printString("TM::Compl "); SerialLog::printUInt(isEndVout); SerialLog::printD(); SerialLog::printUInt(value); SerialLog::printD(); SerialLog::printUInt(getMinValueB()); //SerialLog::printD(); SerialLog::printUInt(minValue_);  //ign
-// SerialLog::printNL();  //ign
+// SerialLog::printString("TM::isComlete "); SerialLog::printUInt(isEndVout); SerialLog::printD(); SerialLog::printUInt(value); SerialLog::printD(); SerialLog::printUInt(minValue_); SerialLog::printD(); SerialLog::printUInt(getMinValueB());
+// SerialLog::printNL();
+
     if(balance_) {
         //if(value > max(minBalanceValue_, minValue_))
         if(value > max(IBALANCE, minValue_))
             Balancer::done_ = false;
-    //    if(Ifalling_ != LastRthMesurment)
+//        if(Ifalling_ != LastRthMesurment)				//ign
             bstatus_ = Balancer::doStrategy();
 	}
 
@@ -184,15 +183,10 @@ AnalogInputs::ValueType TheveninMethod::calculateNewValue(bool isEndVout, Analog
     calculateRthVth(oldValue);
     storeOldValue(oldValue);
 	
-/*      AnalogInputs::ValueType Verr = 0;
+/*     AnalogInputs::ValueType Verr = 0;
 	AnalogInputs::ValueType Vend_per_cell = Balancer::calculatePerCell(Vend_);
-	//Vcell_err = 0;
- SerialLog::printString("TM::cNV ");
   	for(uint8_t i = 0; i < cells_; i++) {
 		int16_t error = Balancer::getV(i);
-		//int16_t error = AnalogInputs::getRealValue(AnalogInputs::Name(AnalogInputs::Vb1+i));
- SerialLog::printUInt(error); SerialLog::printD(); //SerialLog::printUInt(value); SerialLog::printD(); SerialLog::printUInt(getMinValueB()); //SerialLog::printD(); SerialLog::printUInt(minValue_);  //ign
-
 		if(!IO::digitalRead(SMPS_DISABLE_PIN)) {
 			error -= Vend_per_cell;
 		}
@@ -201,8 +195,7 @@ AnalogInputs::ValueType TheveninMethod::calculateNewValue(bool isEndVout, Analog
 		}
 		if (error > 0) Verr += error;	
 	}
- SerialLog::printNL();  //ign
-	if(Verr > 0) Vcell_err += Verr;
+	if(Verr > 1) Vcell_err+= Verr;
 	else if(Vcell_err)  Vcell_err -= 2;
 
 	if(!IO::digitalRead(SMPS_DISABLE_PIN)) {
@@ -213,8 +206,8 @@ AnalogInputs::ValueType TheveninMethod::calculateNewValue(bool isEndVout, Analog
 
     return Vend_ - Vcell_err;
 	}
-	else return Vend_ + Vcell_err; */
-
+	else return Vend_ + Vcell_err;
+ */
     return Vend_;
 }
 

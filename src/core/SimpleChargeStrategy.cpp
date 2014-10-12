@@ -31,7 +31,7 @@ void SimpleChargeStrategy::powerOn()
 //    uint16_t value = AnalogInputs::reverseCalibrateValue(AnalogInputs::IsmpsValue, I);
     TheveninMethod::setVIB(Vc, I, false);
     TheveninMethod::initialize(AnalogInputs::IsmpsValue);
-    SMPS::setValue(I, Vc);		//ign
+    SMPS::setRealValue(I, Vc);    //ign
 }
 
 void SimpleChargeStrategy::powerOff()

@@ -45,7 +45,7 @@ namespace hardware {
     void setBalancerOutput(bool enable);
 
     void setChargerValue(uint16_t current, uint16_t voltage);
-    void setDischargerValue(uint16_t current, uint16_t voltage);
+//    void setDischargerValue(uint16_t current, uint16_t voltage);
     void setDischarge(uint16_t curr);
     void setBalancer(uint8_t balance);
     void doInterrupt();

@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Discharger.h"
-#include "Program.h"    
+#include "Program.h"
 #include "Utils.h"
 #include "Settings.h"
 
@@ -35,7 +35,7 @@ namespace Discharger {
     bool isPowerOn()    { return getState() == DISCHARGING; }
     bool isWorking()    { return current_ != 0; }
     uint16_t getValue() { return current_; }
-uint16_t voltage;
+uint16_t voltage_;
 }
 
 void Discharger::initialize()
@@ -44,9 +44,9 @@ void Discharger::initialize()
     powerOff(DISCHARGING_COMPLETE);
 }
 
-void Discharger::setValue(uint16_t current, uint16_t volt)
+void Discharger::setValue(uint16_t current, uint16_t voltage)
 {
-voltage = volt;
+voltage_ = voltage;
     //if (settings.calibratedState_ >= 7)
     if (Program::programState_ != Program::Calibration)
     {
@@ -77,15 +77,17 @@ void Discharger::finalizeValueTintern(bool force)
 
     if(v != current_ || force) {
         current_ = v;
-        hardware::setDischargerValue(AnalogInputs::reverseCalibrateValue(AnalogInputs::Idischarge, current_), AnalogInputs::reverseCalibrateValue(AnalogInputs::Vout_plus_pin, voltage));
+    //    hardware::setChargerValue(AnalogInputs::reverseCalibrateValue(AnalogInputs::Idischarge, current_), AnalogInputs::reverseCalibrateValue(AnalogInputs::Vout_plus_pin, voltage));
+        hardware::setChargerValue(current_, voltage_);
         AnalogInputs::resetMeasurement();
     }
 }
 
-void Discharger::setRealValue(uint16_t I)
+void Discharger::setRealValue(uint16_t I, uint16_t V)
 {
-//    uint16_t value = AnalogInputs::reverseCalibrateValue(AnalogInputs::IdischargeValue, I);		//ign
-    setValue(I, 1000);
+    uint16_t current = AnalogInputs::reverseCalibrateValue(AnalogInputs::Idischarge, I);    //ign
+	uint16_t voltage = AnalogInputs::reverseCalibrateValue(AnalogInputs::Vout_plus_pin, V);
+    setValue(current, voltage);
 }
 
 void Discharger::powerOn()

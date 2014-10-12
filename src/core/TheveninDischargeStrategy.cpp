@@ -55,7 +55,6 @@ void TheveninDischargeStrategy::powerOn()
 void TheveninDischargeStrategy::setVI(AnalogInputs::ValueType v, AnalogInputs::ValueType i)
 {
     SimpleDischargeStrategy::setVI(v,i);
-//    TheveninMethod::setVIB(v, AnalogInputs::reverseCalibrateValue(AnalogInputs::IdischargeValue, i), false);
     TheveninMethod::setVIB(v, i, false);    //ign
     setMinI(i/10);
 }
@@ -66,14 +65,9 @@ void TheveninDischargeStrategy::setMinI(AnalogInputs::ValueType i)
 
 Strategy::statusType TheveninDischargeStrategy::doStrategy()
 {
-//    bool stable;
     bool isEndVout = SimpleDischargeStrategy::isMinVout();
-//    uint16_t oldValue = Discharger::getValue();
     uint16_t oldValue = AnalogInputs::getRealValue(AnalogInputs::Idischarge);
-
-    //when discharging near the end, the battery voltage is very unstable
-    //but we need new discharge values at that point
-//    stable = AnalogInputs::isOutStable() || isEndVout;
+//    uint16_t oldValue = AnalogInputs::getAvrADCValue(AnalogInputs::Idischarge);    //ign
 
     //test for charge complete
     bool end = isEndVout;
@@ -86,16 +80,15 @@ Strategy::statusType TheveninDischargeStrategy::doStrategy()
     }
 
 /* //    if(stable) {
-        uint16_t voltage = TheveninMethod::calculateNewValue(isEndVout, oldValue);
-        if(voltage != Discharger::getValue()) {
-            Discharger::setValue(ProgramData::currentProgramData.battery.Id, voltage);
+        uint16_t current = TheveninMethod::calculateNewValue(isEndVout, oldValue);
+        if(current != Discharger::getValue()) {
+            Discharger::setValue(current, TheveninMethod::Vend_);
         }
 //    } */
 	uint16_t voltage = TheveninMethod::calculateNewValue(isEndVout, oldValue);
-	if(Discharger::getValue() != ProgramData::currentProgramData.battery.Id)
-	Discharger::setValue(ProgramData::currentProgramData.battery.Id, voltage);
+	if(Discharger::getValue() != AnalogInputs::reverseCalibrateValue(AnalogInputs::Idischarge, ProgramData::currentProgramData.battery.Id))
+	Discharger::setRealValue(ProgramData::currentProgramData.battery.Id, voltage);
 
     return Strategy::RUNNING;
 }
-
 

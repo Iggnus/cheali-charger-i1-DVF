@@ -145,7 +145,7 @@ Strategy::statusType Monitor::run()
     AnalogInputs::ValueType c = AnalogInputs::getRealValue(AnalogInputs::Cout);
     if(c_limit != PROGRAM_DATA_MAX_CHARGE && c >= c_limit) {
         Program::stopReason_ = PSTR("CAP limit");
-        return Strategy::ERROR;
+        return Strategy::COMPLETE;    //ign   Do not want to stop cycling
     }
     
 #ifdef ENABLE_TIME_LIMIT      
@@ -155,7 +155,7 @@ Strategy::statusType Monitor::run()
         uint16_t chargeMin = Screen::getTotalChargDischargeTime();
         uint16_t time_limit  = ProgramData::currentProgramData.getTimeLimit();
         if(chargeMin >= time_limit) {
-            Program::stopReason_ = PSTR("T limit");
+            Program::stopReason_ = PSTR("Time limit");
             return Strategy::ERROR;
         }               
     }

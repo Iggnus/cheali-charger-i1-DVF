@@ -54,7 +54,7 @@ Strategy::statusType DeltaChargeStrategy::doStrategy()
     if(state_ == PreCharge) {
         if(Vout > ProgramData::currentProgramData.getVoltage(ProgramData::VDischarge)) {
             state_ = RapidCharge;
-            SMPS::setRealValue(ProgramData::currentProgramData.battery.Ic);
+            SMPS::setRealValue(ProgramData::currentProgramData.battery.Ic, ProgramData::currentProgramData.getVoltage(ProgramData::VCharge));
         }
     }
 

@@ -56,8 +56,6 @@ void TheveninChargeStrategy::setVIB(AnalogInputs::ValueType v, AnalogInputs::Val
 }
 void TheveninChargeStrategy::setMinI(AnalogInputs::ValueType i)
 {
-//SerialLog::printString("TCS::setMinI "); SerialLog::printUInt(i);  //ign
-//SerialLog::printNL();  //ign
        TheveninMethod::setMinI(i);
 }
 
@@ -65,9 +63,8 @@ Strategy::statusType TheveninChargeStrategy::doStrategy()
 {
     bool update;
     bool isendVout = isEndVout();
-//    uint16_t oldValue = SMPS::getValue();
-    uint16_t oldValue = AnalogInputs::getRealValue(AnalogInputs::Ismps);		//current
-    //uint16_t oldValue = AnalogInputs::getIout();
+    uint16_t oldValue = AnalogInputs::getRealValue(AnalogInputs::Ismps);    //current
+//    uint16_t oldValue = AnalogInputs::getAvrADCValue(AnalogInputs::Ismps);    //ign
 	
     //test if charge complete
     if(TheveninMethod::isComlete(isendVout, oldValue)) {
@@ -76,14 +73,14 @@ Strategy::statusType TheveninChargeStrategy::doStrategy()
     }
 
 //    update = AnalogInputs::isOutStable() || isendVout || TheveninMethod::isBelowMin(oldValue);
-	//uint16_t voltage;
+
 //    if(update && !Balancer::isWorking()) {
 //    if(!Balancer::isWorking()) {
 
-	uint16_t voltage = TheveninMethod::calculateNewValue(isendVout, oldValue);
-	if(SMPS::getValue() != ProgramData::currentProgramData.battery.Ic) 
-	SMPS::setValue(ProgramData::currentProgramData.battery.Ic, voltage);
-//}	
+  uint16_t voltage = TheveninMethod::calculateNewValue(isendVout, oldValue);
+  if(SMPS::getValue() != ProgramData::currentProgramData.battery.Ic)
+  SMPS::setRealValue(ProgramData::currentProgramData.battery.Ic, voltage);
+//}
     return Strategy::RUNNING;
 }
 
@@ -95,8 +92,6 @@ bool TheveninChargeStrategy::isEndVout()
 
     return Vc <= AnalogInputs::getVout()+50 || Balancer::isMaxVout(Vc_per_cell);
 }
-
-
 
 
 

@@ -40,8 +40,7 @@ void SimpleDischargeStrategy::powerOn()
     Discharger::powerOn();
     Balancer::powerOn();
 
-    //Discharger::setRealValue(I_, V_);
-    Discharger::setRealValue(I_);
+    Discharger::setRealValue(I_, V_);
 }
 
 

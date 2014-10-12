@@ -25,10 +25,10 @@
 #include "AnalogInputs.h"
 
 
-#include "IO.h"			//ign
 #include "ProgramData.h" 	 //ign
 #include "TheveninChargeStrategy.h"		//ign
 #include "TheveninDischargeStrategy.h"		//ign
+#include "IO.h"			//ign
 
 
 namespace Strategy {
@@ -203,7 +203,8 @@ namespace Strategy {
             if(!run && exitImmediately)
                 return status;
 
-        } while(key != BUTTON_STOP); // || !Keyboard::getSpeed());
+//        } while(key != BUTTON_STOP || !Keyboard::getSpeed());
+        } while(key != BUTTON_STOP);
 
         Screen::powerOff();
         strategyPowerOff();
